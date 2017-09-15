@@ -198,9 +198,26 @@ Lexer::Lexer(const LangOptions &Options,
   }
 }
 
+bool Lexer::checkForStartOfExecutable() {
+  return llvm::StringSwitch<bool>(BufferStart)
+  .StartsWith("\xCE\xFA\xED\xFE", true) // MH_CIGAM
+  .StartsWith("\xFE\xED\xFA\xCE", true) // MH_MAGIC
+  .StartsWith("\xCF\xFA\xED\xFE", true) // MH_CIGAM_64
+  .StartsWith("\xFE\xED\xFA\xCF", true) // MH_MAGIC_64
+  .StartsWith("\x7F\x45\x4C\x46", true) // ELF header magic number
+  .Default(false);
+}
+
 void Lexer::primeLexer() {
   assert(NextToken.is(tok::NUM_TOKENS));
-  lexImpl();
+  if (checkForStartOfExecutable()) {
+    diagnose(CurPtr, diag::lex_start_of_executable);
+    NextToken.setAtStartOfLine(CurPtr == BufferStart);
+    formToken(tok::eof, CurPtr);
+  } else {
+    lexImpl();
+  }
+        
   assert((NextToken.isAtStartOfLine() || CurPtr != BufferStart) &&
          "The token should be at the beginning of the line, "
          "or we should be lexing from the middle of the buffer");
