@@ -469,6 +469,9 @@ public:
   };
 
 private:
+    
+  bool checkForStartOfExecutable();
+
   /// For a source location in the current buffer, returns the corresponding
   /// pointer.
   const char *getBufferPtrForSourceLoc(SourceLoc Loc) const {

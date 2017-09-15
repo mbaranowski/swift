@@ -98,6 +98,8 @@ ERROR(lex_utf16_bom_marker,none,
 
 ERROR(lex_hashbang_not_allowed,none,
       "hashbang line is allowed only in the main file", ())
+ERROR(lex_start_of_executable,none,
+      "start of executable detected when expecting source file; did you mean to use call executable directly?", ())
 
 ERROR(lex_unprintable_ascii_character,none,
       "unprintable ASCII character found in source file", ())
